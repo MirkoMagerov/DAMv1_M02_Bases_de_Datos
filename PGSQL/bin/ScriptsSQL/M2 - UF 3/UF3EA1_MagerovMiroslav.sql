@@ -27,8 +27,7 @@ do $$
 $$
 
 
-/* Exercici 3. Crea un bloc anònim amb variables PL/SQL que mostri el salari de l'empleat amb id=120, has
-de declarar una variable de tipus salary. */
+/* Exercici 3. Crea un bloc anònim amb variables PL/SQL que mostri el salari de l'empleat amb id=120, has de declarar una variable de tipus salary. */
 do $$
     declare
         salario EMPLOYEES.salary%TYPE;
