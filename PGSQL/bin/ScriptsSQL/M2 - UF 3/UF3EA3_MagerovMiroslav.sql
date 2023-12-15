@@ -87,7 +87,7 @@ do $$
 $$
 
 /* Exercici 4. Realitzar un programa que contingui un procediment anomenat PROC_ALTA_JOB que doni d’alta un nou ofici (JOB) a la taula jobs. Totes les dades del nou ofici s’han de passat com com a paràmetre. S’ha de programar un bloc principal que pregunti a l’usuari totes les dades del nou ofici i cridi el procediment PROC_ALTA_JOB. Abans d’inserir s’ha de comprovar que el valor màxim i mínim del salari no sigui negatiu i a més, que el salari mínim sigui més petit que el salari màxim. Mostra els missatges d’error corresponents. */
-CREATE OR REPLACE FUNCTION PROC_ALTA_JOB(
+SELECT * FROM jobs;CREATE OR REPLACE FUNCTION PROC_ALTA_JOB(
     job_id_p IN VARCHAR, job_title_p IN VARCHAR, job_min_salary_p IN NUMERIC, job_max_salary_p IN NUMERIC)
     RETURNS jobs
 AS
@@ -103,7 +103,6 @@ $$
         return created_row;
     end;
 $$ LANGUAGE plpgsql;
-
 
 do $$
     declare
