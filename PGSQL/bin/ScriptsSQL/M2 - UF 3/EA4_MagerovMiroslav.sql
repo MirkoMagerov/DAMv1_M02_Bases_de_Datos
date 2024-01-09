@@ -1,5 +1,4 @@
 /* ********************** EXERCICI 1 ********************** */
-/* BORRA TODOS LOS REGISTROS */ 
 CREATE OR REPLACE PROCEDURE proc_baixa_emp(id IN NUMERIC)
 AS
 $$
@@ -31,6 +30,8 @@ DO $$
         CALL PROC_BAIXA_EMP(id_empleat);
     END;
 $$
+
+/* Hay que borrar las claves foraneas para poder borrar el registro del empleado*/
 
 
 /* ********************** EXERCICI 2 ********************** */
