@@ -124,7 +124,7 @@ DO $$
             RAISE NOTICE 'Comença per la lletra A.';
         ELSE
             RAISE NOTICE 'No comença per la lletra A. ';
-        end if;
+        END IF;
 
     EXCEPTION
         WHEN SQLSTATE 'P0002' THEN
@@ -134,3 +134,49 @@ DO $$
         WHEN OTHERS THEN
             RAISE EXCEPTION 'ERROR: Sense definir';
     END;$$;
+
+    /* JOC DE PROVES */
+    /* Department_id = 999 | 'ERROR: no dades.'*/
+    /* Department_id = 10 | 'Administration, empieza por A.' */
+    /* Department_id = 20 | 'Marketing, no empieza por A.'*/
+
+
+/* -------------------------------------- EX4 -------------------------------------- */
+CREATE OR REPLACE PROCEDURE proc_loc_address (loc_id NUMERIC, new_street_address VARCHAR) LANGUAGE plpgsql
+AS $$
+    BEGIN
+        UPDATE locations
+        SET street_address = new_street_address
+        WHERE location_id = loc_id;
+
+        IF NOT FOUND THEN
+            RAISE EXCEPTION 'La actualización no afectó ninguna fila. Código de localidad inexistente.';
+        END IF;
+    END;$$;
+
+CREATE OR REPLACE FUNCTION func_comprovar_loc (codi_loc NUMERIC) RETURNS BOOLEAN
+LANGUAGE plpgsql AS $$
+    DECLARE
+        cod_loc_id NUMERIC;
+    BEGIN
+        SELECT location_id INTO STRICT cod_loc_id FROM locations WHERE location_id = codi_loc;
+        RETURN TRUE;
+    END;$$;
+
+DO $$
+    DECLARE
+        var_cod_loc NUMERIC := :loc;
+        var_new_street_address VARCHAR := :address;
+    BEGIN
+    IF (func_comprovar_loc(var_cod_loc)) THEN
+        CALL proc_loc_address(var_cod_loc,var_new_street_address);
+    END IF;
+
+    EXCEPTION
+        WHEN SQLSTATE 'P0002' THEN
+            RAISE EXCEPTION 'ERROR: No existe código de la localidad.';
+    END;$$ LANGUAGE plpgsql;
+
+    /* JOC DE PROVES */
+    /* var_cod_loc = 1 | 'ERROR: No existe código de la localidad.' */
+    /* var_cod_loc = 1000, var_new_street_address = "Aiguablava 121" | Localidad actualizada */
