@@ -1,21 +1,33 @@
 /* EX 1*/
+/* Fetch*/
 DO $$
     DECLARE
-        my_cursor refcursor;
-        employee_cursor CURSOR FOR SELECT employee_id, first_name, salary, commission_pct, hire_date FROM employees;
-        emp_id NUMERIC;
-        emp_first_name VARCHAR;
-        emp_salary NUMERIC;
-        emp_commision NUMERIC;
-        emp_hire_date DATE;
+        employee_cursor CURSOR FOR SELECT * FROM employees;
+        employee employees%ROWTYPE;
     BEGIN
         open employee_cursor;
         loop
-            FETCH employee_cursor INTO emp_id, emp_first_name, emp_salary, emp_commision, emp_hire_date;
-            IF (emp_commision IS NULL) THEN
-                emp_commision = 0;
+            FETCH employee_cursor INTO employee;
+            EXIT WHEN NOT FOUND;
+            IF (employee.commission_pct IS NULL) THEN
+                employee.commission_pct = 0;
             END IF;
-            RAISE NOTICE 'Datos: % | % | % | % | %', emp_id, emp_first_name, emp_salary, emp_commision, emp_hire_date;
+            RAISE NOTICE 'Datos: % | % | % | % | %', employee.employee_id, employee.first_name, employee.salary, employee.commission_pct, employee.hire_date;
+        END LOOP;
+        CLOSE employee_cursor;
+    END;
+$$ LANGUAGE plpgsql;
+
+/* FOR IN*/
+DO $$
+    DECLARE
+        employee employees%ROWTYPE;
+    BEGIN
+        FOR employee IN SELECT * FROM employees LOOP
+            IF (employee.commission_pct IS NULL) THEN
+                employee.commission_pct = 0;
+            END IF;
+            RAISE NOTICE 'Datos: % | % | % | % | %', employee.employee_id, employee.first_name, employee.salary, employee.commission_pct, employee.hire_date;
         END LOOP;
     END;
 $$ LANGUAGE plpgsql;
