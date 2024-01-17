@@ -52,3 +52,43 @@ DO $$
     BEGIN
         SELECT * FROM func_emps_dep(var_dep_id);
     END;$$ LANGUAGE plpgsql;
+
+
+/* EX 4 */
+DO $$
+DECLARE
+    employee_cursor CURSOR FOR SELECT * FROM employees;
+    new_salary NUMERIC;
+BEGIN
+    FOR employee IN employee_cursor LOOP
+        new_salary = ROUND(employee.salary + (employee.salary * 18 / 100), 2);
+        RAISE NOTICE 'El salari antic de l`empleat % era % i el nou serà: %.', employee.employee_id, employee.salary, new_salary;
+        UPDATE emp_nou_salary SET salary = new_salary WHERE emp_nou_salary.employee_id = employee.employee_id;
+    END LOOP;
+END;$$ LANGUAGE plpgsql;
+
+
+/* EX 5 */
+DO $$
+DECLARE
+    emp_cursor CURSOR FOR SELECT * FROM emp_nou_salary;
+    employee emp_nou_salary%ROWTYPE;
+    var_depID departments.department_id%TYPE = :id;
+BEGIN
+    OPEN emp_cursor;
+    LOOP
+        FETCH emp_cursor INTO employee;
+        IF (NOT FOUND) THEN
+            RAISE NOTICE 'Ya no hay más empleados en ese departamento';
+        end if;
+        IF (employee.department_id = var_depID) THEN
+            IF (employee.commission_pct == null) THEN
+                UPDATE emp_nou_salary SET commission_pct = 0 WHERE employee_id = employee.employee_id;
+            ELSE
+                UPDATE emp_nou_salary SET commission_pct = (commission_pct + 0.20) WHERE employee_id = employee.employee_id;
+            end if;
+        END IF;
+    END LOOP;
+
+    CLOSE emp_cursor;
+END;$$ LANGUAGE plpgsql;
