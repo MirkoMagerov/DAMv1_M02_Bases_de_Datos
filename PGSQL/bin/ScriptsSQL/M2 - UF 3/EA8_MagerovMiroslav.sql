@@ -80,15 +80,29 @@ BEGIN
         FETCH emp_cursor INTO employee;
         IF (NOT FOUND) THEN
             RAISE NOTICE 'Ya no hay más empleados en ese departamento';
-        end if;
+            EXIT;
+        END IF;
         IF (employee.department_id = var_depID) THEN
-            IF (employee.commission_pct == null) THEN
+            IF (employee.commission_pct IS NULL) THEN
                 UPDATE emp_nou_salary SET commission_pct = 0 WHERE employee_id = employee.employee_id;
             ELSE
-                UPDATE emp_nou_salary SET commission_pct = (commission_pct + 0.20) WHERE employee_id = employee.employee_id;
-            end if;
+                UPDATE emp_nou_salary SET commission_pct = (employee.commission_pct + 0.20) WHERE employee_id = employee.employee_id;
+            END IF;
         END IF;
     END LOOP;
-
     CLOSE emp_cursor;
+END;$$ LANGUAGE plpgsql;
+
+
+/* EX 6 */
+DO $$
+DECLARE
+    emp_cursor CURSOR FOR SELECT * FROM emp_with_comiss;
+    actual_employee emp_with_comiss%ROWTYPE;
+BEGIN
+    FOR actual_employee IN emp_cursor LOOP
+        IF (actual_employee.commission_pct IS NULL) THEN
+            DELETE FROM emp_with_comiss WHERE employee_id = actual_employee.employee_id;
+        END IF;
+    END LOOP;
 END;$$ LANGUAGE plpgsql;
